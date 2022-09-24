@@ -1,6 +1,6 @@
 class TeamsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_team, only: %i[show edit update destroy]
+  before_action :set_team, only: %i[show edit update destroy assign_owner]
 
   def index
     @teams = Team.all
@@ -18,6 +18,7 @@ class TeamsController < ApplicationController
   def edit
     if current_user.id != @team.owner_id
       redirect_to @team, notice: 'リーダー以外は編集できません'
+    end
   end
 
   def create
@@ -48,6 +49,11 @@ class TeamsController < ApplicationController
 
   def dashboard
     @team = current_user.keep_team_id ? Team.find(current_user.keep_team_id) : current_user.teams.first
+  end
+
+  def assign_owner
+    @team.update(owner_id: params[:owner_id])
+    redirect_to team_path(@team), notice: 'リーダーが変更されました！'
   end
 
   private
