@@ -52,7 +52,9 @@ class TeamsController < ApplicationController
   end
 
   def assign_owner
+    @before_owner = @team.owner
     @team.update(owner_id: params[:owner_id])
+    TeamMailer.change_owner_mail(@team.owner.email,@before_owner.email).deliver
     redirect_to team_path(@team), notice: 'リーダーが変更されました！'
   end
 
